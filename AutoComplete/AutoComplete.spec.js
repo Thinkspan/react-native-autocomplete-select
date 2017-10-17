@@ -1,9 +1,14 @@
 /* global describe, it, expect, beforeEach, jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import Enzyme, { shallow } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
 
 import AutoComplete from '../'
+
+Enzyme.configure({ adapter: new Adapter() })
+
+function noop () {}
 
 describe('AutoComplete', () => {
   let fakeSuggestions
@@ -19,7 +24,7 @@ describe('AutoComplete', () => {
 
   it('renders correctly', () => {
     expect(shallow(
-      <AutoComplete />
+      <AutoComplete onSelect={noop} />
     )).toMatchSnapshot()
   })
 
@@ -28,7 +33,8 @@ describe('AutoComplete', () => {
       value: '0.5',
       suggestions: fakeSuggestions,
       suggestionObjectTextProperty: 'text',
-      minimumSimilarityScore: 0.5
+      minimumSimilarityScore: 0.5,
+      onSelect: noop
     }
 
     const wrapper = shallow(
@@ -37,6 +43,7 @@ describe('AutoComplete', () => {
 
     wrapper.instance().componentDidMount()
     wrapper.instance().forceUpdate()
+    wrapper.update()
 
     expect(wrapper.find('TouchableHighlight').length).toEqual(2)
 
@@ -49,7 +56,8 @@ describe('AutoComplete', () => {
       value: '0.5',
       suggestions: fakeSuggestions,
       suggestionObjectTextProperty: 'text',
-      minimumSimilarityScore: 0.5
+      minimumSimilarityScore: 0.5,
+      onSelect: noop
     }
 
     const wrapper = shallow(
@@ -58,6 +66,7 @@ describe('AutoComplete', () => {
 
     wrapper.instance().componentDidMount()
     wrapper.instance().forceUpdate()
+    wrapper.update()
 
     expect(wrapper.find('TouchableHighlight').length).toEqual(2)
 
@@ -83,6 +92,7 @@ describe('AutoComplete', () => {
 
     wrapper.instance().componentDidMount()
     wrapper.instance().forceUpdate()
+    wrapper.update()
 
     expect(wrapper.find('TouchableHighlight').length).toEqual(2)
 
@@ -92,13 +102,17 @@ describe('AutoComplete', () => {
     expect(params.onSelect.mock.calls[0]).toEqual([{
       text: '0.5'
     }])
+
     wrapper.instance().forceUpdate()
+    wrapper.update()
+
     expect(wrapper.find('TouchableHighlight').length).toEqual(0)
   })
 
   it('correctly calls the onChangeText callback when the text changes', () => {
     const params = {
-      onChangeText: jest.fn()
+      onChangeText: jest.fn(),
+      onSelect: noop
     }
 
     const wrapper = shallow(
